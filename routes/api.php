@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\SubKategoriController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,14 @@ Route::controller(DivisionController::class)->prefix('master/division')->group(f
 
 Route::controller(KategoriController::class)->prefix('master/kategori')->group(function () {
     Route::get('', 'index');
+    Route::post('', 'save');
+    Route::put('update/{id}', 'update');
+    Route::delete('delete/{id}', 'delete');
+});
+
+Route::controller(SubKategoriController::class)->prefix('master/sub-kategori')->group(function () {
+    Route::get('', 'index');
+    Route::get('view/{id}', 'view');
     Route::post('', 'save');
     Route::put('update/{id}', 'update');
     Route::delete('delete/{id}', 'delete');
