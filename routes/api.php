@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\SubKategoriController;
+use App\Http\Controllers\SegmenController;
+use App\Http\Controllers\SubSegmenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,22 @@ Route::controller(KategoriController::class)->prefix('master/kategori')->group(f
 });
 
 Route::controller(SubKategoriController::class)->prefix('master/sub-kategori')->group(function () {
+    Route::get('', 'index');
+    Route::get('view/{id}', 'view');
+    Route::post('', 'save');
+    Route::put('update/{id}', 'update');
+    Route::delete('delete/{id}', 'delete');
+});
+
+Route::controller(SegmenController::class)->prefix('master/segmen')->group(function () {
+    Route::get('', 'index');
+    Route::get('view/{id}', 'view');
+    Route::post('', 'save');
+    Route::put('update/{id}', 'update');
+    Route::delete('delete/{id}', 'delete');
+});
+
+Route::controller(SubSegmenController::class)->prefix('master/sub-segmen')->group(function () {
     Route::get('', 'index');
     Route::get('view/{id}', 'view');
     Route::post('', 'save');

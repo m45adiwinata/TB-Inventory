@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SubKategori;
+use App\Models\Segmen;
 use Validator;
 
-class SubKategoriController extends Controller
+class SegmenController extends Controller
 {
     public function __construct()
     {
@@ -15,8 +15,8 @@ class SubKategoriController extends Controller
 
     public function index(Request $request)
     {
-        $data = SubKategori::with(['kategori' => function($query) {
-            $query->select('id', 'nama_kategori');
+        $data = Segmen::with(['subKategori' => function($query) {
+            $query->select('id', 'kode_sub_kategori', 'nama_sub_kategori');
         }]);
         if (isset($request->maxrows)) {
             if (isset($request->pagenum)) {
@@ -32,7 +32,7 @@ class SubKategoriController extends Controller
 
     public function view($id)
     {
-        $data = SubKategori::with('kategori')->find($id);
+        $data = Segmen::with('subKategori')->find($id);
 
         return response()->json(['message' => 'oke', 'data' => $data], 200);
     }
@@ -40,53 +40,53 @@ class SubKategoriController extends Controller
     public function save(Request $request)
     {
         $validator = Validator::make($request->all(),[ 
-            'id_kategori' => 'required|integer',
-            'kode_sub_kategori' => 'required|integer',
-            'nama_sub_kategori' => 'required|string'
+            'id_sub_kategori' => 'required|integer',
+            'kode_segmen' => 'required|integer',
+            'nama_segmen' => 'required|string'
         ]);
         if($validator->fails()) {          
             return response()->json(['error'=>$validator->errors()], 401);                        
         }
-        $newsk = $validator->validated();
-        $newsk['usercreate'] = auth()->user()->username;
-        $sk = SubKategori::create($newsk);
+        $newdata = $validator->validated();
+        $newdata['usercreate'] = auth()->user()->username;
+        $data = Segmen::create($newdata);
 
         return response()->json([
-            'message'=>'Sub kategori berhasil dibuat', 
-            'data' => $sk
+            'message'=>'Segmen berhasil dibuat', 
+            'data' => $data
         ], 201);
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(),[ 
-            'id_kategori' => 'required|integer',
-            'kode_sub_kategori' => 'required|integer',
-            'nama_sub_kategori' => 'required|string'
+            'id_sub_kategori' => 'required|integer',
+            'kode_segmen' => 'required|integer',
+            'nama_segmen' => 'required|string'
         ]);
         if($validator->fails()) {          
             return response()->json(['error'=>$validator->errors()], 401);                        
         }
-        $newsk = $validator->validated();
-        $newsk['usermodify'] = auth()->user()->username;
-        SubKategori::where('id', $id)->update($newsk);
-        $sk = SubKategori::find($id);
+        $newdata = $validator->validated();
+        $newdata['usermodify'] = auth()->user()->username;
+        Segmen::where('id', $id)->update($newdata);
+        $data = Segmen::find($id);
 
         return response()->json([
-            'message'=>'Sub kategori berhasil diupdate', 
-            'data' => $sk
+            'message'=>'Segmen berhasil diupdate', 
+            'data' => $data
         ], 201);
     }
 
     public function delete($id)
     {
-        SubKategori::where('id', $id)->update([
+        Segmen::where('id', $id)->update([
             'userdelete' => auth()->user()->username,
             'deleted_at' => date("Y-m-d H:i:s")
         ]);
 
         return response()->json([
-            'message'=>'Sub kategori berhasil dihapus'
+            'message'=>'Segmen berhasil dihapus'
         ], 201);
     }
 }

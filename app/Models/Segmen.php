@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Kategori extends Model
+class Segmen extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    
-    protected $table = 'kategori';
+
+    protected $table = 'segmen';
     protected $guarded = [];
 
-    public function division()
+    public function subKategori()
     {
-        return $this->belongsTo('App\Models\Division', 'division_code', 'code');
+        return $this->belongsTo('App\Models\SubKategori', 'id_sub_kategori', 'id');
     }
 }

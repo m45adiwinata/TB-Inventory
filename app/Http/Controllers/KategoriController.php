@@ -13,9 +13,19 @@ class KategoriController extends Controller
         $this->middleware('auth:api');
     }
     
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['message'=>'oke', 'data' => Kategori::get()], 200);
+        $data = Kategori::with('division');
+        if (isset($request->maxrows)) {
+            if (isset($request->pagenum)) {
+                $data = $data->skip(($request->pagenum-1) * $request->maxrows)->take($request->maxrows);
+            } else {
+                $data = $data->skip(0)->take($request->maxrows);
+            }
+        }
+        $data = $data->get();
+
+        return response()->json(['message'=>'oke', 'data' => $data], 200);
     }
 
     public function save(Request $request)
@@ -41,7 +51,9 @@ class KategoriController extends Controller
         if($validator->fails()) {          
             return response()->json(['error'=>$validator->errors()], 401);                        
         }
-        $kategori = Kategori::create($validator->validated());
+        $newdata = $validator->validated();
+        $newdata['usercreate'] = auth()->user()->username;
+        $kategori = Kategori::create($newdata);
 
         return response()->json([
             'message'=>'Kategori berhasil dibuat', 
@@ -72,16 +84,23 @@ class KategoriController extends Controller
         if($validator->fails()) {          
             return response()->json(['error'=>$validator->errors()], 401);                        
         }
-        Kategori::where('id', $id)->update($validator->validated());
+        $newdata = $validator->validated();
+        $newdata['usermodify'] = auth()->user()->username;
+        Kategori::where('id', $id)->update($newdata);
+        $data = Kategori::find($id);
 
         return response()->json([
-            'message'=>'Kategori berhasil diupdate'
+            'message' => 'Kategori berhasil diupdate',
+            'data' => $data
         ], 201);
     }
 
     public function delete($id)
     {
-        Kategori::where('id', $id)->delete();
+        Kategori::where('id', $id)->update([
+            'userdelete' => auth()->user()->username,
+            'deleted_at' => date("Y-m-d H:i:s")
+        ]);
 
         return response()->json([
             'message'=>'Kategori berhasil dihapus'
