@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kategori;
 use Validator;
+use \PhpOffice\PhpSpreadsheet\IOFactory;
 
 class KategoriController extends Controller
 {
@@ -48,8 +49,8 @@ class KategoriController extends Controller
             'bonus_item' => 'required',
             'costing_expense' => 'required'
         ]);
-        if($validator->fails()) {          
-            return response()->json(['error'=>$validator->errors()], 401);                        
+        if($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
         }
         $newdata = $validator->validated();
         $newdata['usercreate'] = auth()->user()->username;
@@ -106,4 +107,20 @@ class KategoriController extends Controller
             'message'=>'Kategori berhasil dihapus'
         ], 201);
     }
+
+    public function importExcel(Request $request)
+    {
+        $validator = Validator::make($request->all(),[ 
+            'file' => 'required|mimes:xlsx'
+        ]);
+        if($validator->fails()) {          
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
+        if ($file = $request->file('file')) {
+            $spreadsheet = IOFactory::load($request->file);
+            $data = $spreadsheet->getActiveSheet()->toArray();
+            dd($spreadsheet->getActiveSheet()->toArray());
+        }
+    }
+    
 }

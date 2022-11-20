@@ -8,6 +8,7 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\SubKategoriController;
 use App\Http\Controllers\SegmenController;
 use App\Http\Controllers\SubSegmenController;
+use App\Http\Controllers\MaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ Route::controller(KategoriController::class)->prefix('master/kategori')->group(f
     Route::post('', 'save');
     Route::put('update/{id}', 'update');
     Route::delete('delete/{id}', 'delete');
+    Route::post('import-excel', 'importExcel');
 });
 
 Route::controller(SubKategoriController::class)->prefix('master/sub-kategori')->group(function () {
@@ -67,4 +69,13 @@ Route::controller(SubSegmenController::class)->prefix('master/sub-segmen')->grou
     Route::post('', 'save');
     Route::put('update/{id}', 'update');
     Route::delete('delete/{id}', 'delete');
+});
+
+Route::controller(MaterialController::class)->prefix('master/material')->group(function () {
+    Route::get('', 'index');
+    Route::get('view/{id}', 'view');
+    Route::post('', 'save');
+    Route::put('update/{id}', 'update');
+    Route::delete('delete/{id}', 'delete');
+    Route::get('download-template', 'createExcelFormat');
 });
