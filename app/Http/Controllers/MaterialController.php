@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class MaterialController extends Controller
 {
@@ -36,6 +37,13 @@ class MaterialController extends Controller
         $data = $data->get();
 
         return response()->json(['message'=>'oke', 'data' => $data], 200);
+    }
+
+    public function view($id)
+    {
+        $data = Material::find($id);
+
+        return response()->json(['message' => 'oke', 'data' => $data], 200);
     }
 
     public function createExcelFormat()
@@ -74,29 +82,27 @@ class MaterialController extends Controller
             $sheet2->setCellValue("A$j", $s);
             $j++;
         }
-        for ($i = 5; $i <= 15; $i++) {
-            $validation = $sheet->getCell("A$i")->getDataValidation();
-            $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-            $validation->setFormula1('\'sub segmen\'!$A$1:$A$'.($j-1));
-            $validation->setAllowBlank(false);
-            $validation->setShowDropDown(true);
-            // $validation->setShowInputMessage(true);
-            // $validation->setPromptTitle('Note');
-            // $validation->setPrompt('Must select one from the drop down options.');
-            // $validation->setShowErrorMessage(true);
-            // $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
-            // $validation->setErrorTitle('Invalid option');
-            // $validation->setError('Select one from the drop down list.');
-        }
+        $validation = $sheet->getCell("A5")->getDataValidation();
+        $validation->setType(DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(DataValidation::STYLE_INFORMATION );
+        $validation->setAllowBlank(false);
+        $validation->setShowInputMessage(true);
+        $validation->setShowErrorMessage(true);
+        $validation->setShowDropDown(true);
+        $validation->setErrorTitle('Input error');
+        $validation->setError('Value is not in list.');
+        $validation->setPromptTitle('Pick from list');
+        $validation->setPrompt('Please pick a value from the drop-down list.');
+        $validation->setFormula1('\'sub segmen\'!$A$1:$A$'.($j-1));
+        $validation->setSqref("A5:A15");
         
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'create-xlsx-files-with-drop-down-list-data-validation.xlsx';
+        $filename = 'TBInventory - Template Import Material.xlsx';
         try {
             ob_clean();
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');
             header('Cache-Control: max-age=0');
-            // $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
             exit(0);
         } catch (\Throwable $th) {
@@ -113,10 +119,11 @@ class MaterialController extends Controller
             return response()->json(['error'=>$validator->errors()], 401);
         }
         if ($file = $request->file('file')) {
-            $spreadsheet = IOFactory::load($request->file);
+            $spreadsheet = IOFactory::load($file);
             $data = $spreadsheet->getActiveSheet()->toArray();
             
-            dd($spreadsheet->getActiveSheet()->toArray());
+            dd($data);
+            
         }
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\SubKategoriController;
 use App\Http\Controllers\SegmenController;
 use App\Http\Controllers\SubSegmenController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,4 +80,14 @@ Route::controller(MaterialController::class)->prefix('master/material')->group(f
     Route::put('update/{id}', 'update');
     Route::delete('delete/{id}', 'delete');
     Route::get('download-template', 'createExcelFormat');
+});
+
+Route::controller(VendorController::class)->prefix('master/vendor')->group(function () {
+    Route::get('', 'index');
+    Route::get('view/{id}', 'view');
+    Route::post('', 'save');
+    Route::put('update/{id}', 'update');
+    Route::delete('delete/{id}', 'delete');
+    Route::get('download-template', 'createExcelFormat');
+    Route::post('import-excel', 'importExcel');
 });
